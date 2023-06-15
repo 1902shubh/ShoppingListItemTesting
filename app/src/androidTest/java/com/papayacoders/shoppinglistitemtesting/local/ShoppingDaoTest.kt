@@ -3,31 +3,43 @@ package com.papayacoders.shoppinglistitemtesting.local
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.papayacoders.shoppinglistitemtesting.data.local.ShoppingDao
 import com.papayacoders.shoppinglistitemtesting.data.local.ShoppingItem
 import com.papayacoders.shoppinglistitemtesting.data.local.ShoppingItemDatabase
 import com.papayacoders.shoppinglistitemtesting.getOrAwaitValue
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import javax.inject.Inject
+import javax.inject.Named
 
+@ExperimentalCoroutinesApi
+@SmallTest
+@HiltAndroidTest
 class ShoppingDaoTest {
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var database: ShoppingItemDatabase
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
+
+    @Inject
+    @Named("test_db")
+    lateinit var database: ShoppingItemDatabase
     private lateinit var dao : ShoppingDao
 
     @Before
     fun setup(){
-        database = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(),
-            ShoppingItemDatabase::class.java
-        ).allowMainThreadQueries().build()
+
+        hiltRule.inject()
 
         dao = database.shoppingDao()
     }
